@@ -1,0 +1,32 @@
+wget https://s3.amazonaws.com/ucbdatasciencew205/setup_ucb_complete_plus_postgres.sh
+wget https://s3.amazonaws.com/ucbdatasciencew205/setup_spark.sh
+
+pip install awscli
+pip install httplib2
+pip install bs4
+/data/start_metastore.sh
+sudo -u hdfs hdfs dfs -mkdir /user/w205/literally
+sudo -u hdfs hdfs dfs -chown w205 /user/w205/literally
+sudo -u hdfs hdfs dfs -mkdir /user/w205/literally/bigram
+sudo -u hdfs hdfs dfs -chown w205 /user/w205/literally/bigram
+sudo -u hdfs hdfs dfs -mkdir /user/w205/literally/good_reads
+sudo -u hdfs hdfs dfs -chown w205 /user/w205/literally/good_reads
+
+su - w205
+aws configure
+#get bigram_data
+mkdir /data/bigram_data
+python get_bigrams.py
+gunzip /data/bigram_data/*
+
+#get good_reads data
+cp book_ratings/book_reviews*.csv /data/good_reads/.
+
+hdfs dfs -put /data/bigram_data/* /user/w205/literally/bigram
+
+mkdir /data/good_reads
+hdfs dfs -put /data/good_reads/* /user/w205/literally/good_reads
+
+hive -f create_bigram_table.sql
+
+/data/spark15/bin/spark-sql

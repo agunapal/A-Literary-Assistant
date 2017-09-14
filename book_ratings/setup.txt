@@ -1,0 +1,9 @@
+
+git clone https://github.com/sefakilic/goodreads.git
+
+cd goodreads
+pip install -r requirements.txt
+python setup.py install
+
+Get your developer key from goodreads
+
